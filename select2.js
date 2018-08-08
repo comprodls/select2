@@ -145,9 +145,7 @@ the specific language governing permissions and limitations under the Apache Lic
 
     // closes already opened dropdown if user clicks anywhere in the browser window
     function _closeOpenedDropdown(e) {
-        
-        console.log("I am clicked! " + e);
-               
+              
         var dropdown = $("#select2-drop"), self;
         if (dropdown.length > 0) {
             self=dropdown.data("select2");
@@ -1575,36 +1573,6 @@ the specific language governing permissions and limitations under the Apache Lic
             if(this.dropdown[0] !== this.body.children().last()[0]) {
                 this.dropdown.detach().appendTo(this.body);
             }
-           
-           
-            // create the dropdown mask if doesn't already exist
-            // mask = $("#select2-drop-mask");
-            // if (mask.length === 0) {
-            //     mask = $(document.createElement("div"));
-            //     mask.attr("id","select2-drop-mask").attr("class","select2-drop-mask");
-            //     mask.hide();
-            //     mask.appendTo(this.body);
-            //     mask.on("mousedown touchstart click", function (e) {
-            //         // Prevent IE from generating a click event on the body
-            //         reinsertElement(mask);
-
-            //         var dropdown = $("#select2-drop"), self;
-            //         if (dropdown.length > 0) {
-            //             self=dropdown.data("select2");
-            //             if (self.opts.selectOnBlur) {
-            //                 self.selectHighlighted({noFocus: true});
-            //             }
-            //             self.close();
-            //             //e.preventDefault();
-            //             // e.stopPropagation();
-            //         }
-            //     });
-            // }
-
-            // ensure the mask is always right before the dropdown
-            // if (this.dropdown.prev()[0] !== mask[0]) {
-            //     this.dropdown.before(mask);
-            // }
 
             //RAMAN: redundant code windows click event will always close the drop down.
             //Its a safety check that id by chance any select2 drop is opened, close it before opening any other
