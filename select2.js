@@ -143,6 +143,28 @@ the specific language governing permissions and limitations under the Apache Lic
         return dim;
     }
 
+    // closes already opened dropdown if user clicks anywhere in the browser window
+    function _closeOpenedDropdown(e) {
+        
+        console.log("I am clicked! " + e);
+               
+        var dropdown = $("#select2-drop"), self;
+        if (dropdown.length > 0) {
+            self=dropdown.data("select2");
+            if (self.opts.selectOnBlur) {
+                self.selectHighlighted({noFocus: true});
+            }
+            self.close();
+            // closes already opened dropdown if user clicks anywhere in the browser window 
+            
+        }
+        if(e){
+            $(window).off("mousedown touchstart click", _closeOpenedDropdown);
+        }
+        
+    }
+
+
     /**
      * Compares equality of a and b
      * @param a
@@ -1553,46 +1575,74 @@ the specific language governing permissions and limitations under the Apache Lic
             if(this.dropdown[0] !== this.body.children().last()[0]) {
                 this.dropdown.detach().appendTo(this.body);
             }
-
+           
+           
             // create the dropdown mask if doesn't already exist
-            mask = $("#select2-drop-mask");
-            if (mask.length === 0) {
-                mask = $(document.createElement("div"));
-                mask.attr("id","select2-drop-mask").attr("class","select2-drop-mask");
-                mask.hide();
-                mask.appendTo(this.body);
-                mask.on("mousedown touchstart click", function (e) {
-                    // Prevent IE from generating a click event on the body
-                    reinsertElement(mask);
+            // mask = $("#select2-drop-mask");
+            // if (mask.length === 0) {
+            //     mask = $(document.createElement("div"));
+            //     mask.attr("id","select2-drop-mask").attr("class","select2-drop-mask");
+            //     mask.hide();
+            //     mask.appendTo(this.body);
+            //     mask.on("mousedown touchstart click", function (e) {
+            //         // Prevent IE from generating a click event on the body
+            //         reinsertElement(mask);
 
-                    var dropdown = $("#select2-drop"), self;
-                    if (dropdown.length > 0) {
-                        self=dropdown.data("select2");
-                        if (self.opts.selectOnBlur) {
-                            self.selectHighlighted({noFocus: true});
-                        }
-                        self.close();
-                        e.preventDefault();
-                        e.stopPropagation();
-                    }
-                });
-            }
+            //         var dropdown = $("#select2-drop"), self;
+            //         if (dropdown.length > 0) {
+            //             self=dropdown.data("select2");
+            //             if (self.opts.selectOnBlur) {
+            //                 self.selectHighlighted({noFocus: true});
+            //             }
+            //             self.close();
+            //             //e.preventDefault();
+            //             // e.stopPropagation();
+            //         }
+            //     });
+            // }
 
             // ensure the mask is always right before the dropdown
-            if (this.dropdown.prev()[0] !== mask[0]) {
-                this.dropdown.before(mask);
+            // if (this.dropdown.prev()[0] !== mask[0]) {
+            //     this.dropdown.before(mask);
+            // }
+
+            //RAMAN: redundant code windows click event will always close the drop down.
+            //Its a safety check that id by chance any select2 drop is opened, close it before opening any other
+            var dropdown = $("#select2-drop"), self;
+            if (dropdown.length > 0) {
+                _closeOpenedDropdown();       
+            }
+            //check if the close event does not exist, bind it with window click          
+            if($._data( $(window)[0], "events" )) {
+                var found;
+                var $events = $._data( $(window)[0], "events" ); 
+                if(!$events.click) {
+                    $.each($events, function(i, event){
+                        $.each(event, function(i, handler){
+                            if(handler.type == "click" && handler.handler.name == "_closeOpenedDropdown") {
+                                found = true;
+                            }
+                        });
+                    });
+                }
+                if(!found) {
+                    $(window).on("mousedown touchstart click", _closeOpenedDropdown);
+                }
             }
 
             // move the global id to the correct dropdown
             $("#select2-drop").removeAttr("id");
             this.dropdown.attr("id", "select2-drop");
 
+            
             // show the elements
-            mask.show();
+            // mask.show();
 
             this.positionDropdown();
             this.dropdown.show();
             this.positionDropdown();
+        
+            
 
             this.dropdown.addClass("select2-drop-active");
 
@@ -1603,7 +1653,7 @@ the specific language governing permissions and limitations under the Apache Lic
                 $(this).on(resize+" "+scroll+" "+orient, function (e) {
                     if (that.opened()) that.positionDropdown();
                 });
-            });
+            });        
 
 
         },
@@ -1622,7 +1672,7 @@ the specific language governing permissions and limitations under the Apache Lic
 
             this.clearDropdownAlignmentPreference();
 
-            $("#select2-drop-mask").hide();
+            // $("#select2-drop-mask").hide();
             this.dropdown.removeAttr("id"); // only the active dropdown has the select2-drop id
             this.dropdown.hide();
             this.container.removeClass("select2-dropdown-open").removeClass("select2-container-active");
